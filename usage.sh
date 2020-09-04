@@ -16,41 +16,47 @@ rootdirmov=$rootdir$movdir
 
 cd $rootdir
 
-##### list all the dirs (and only dirs)
+##### list all the dirs (and only dirs) excluding the folder for MOV files
 # use this precise syntax - it is VERY important!!!
-inputdirs=("$(ls */ -d)")
+inputdirs=("$(ls */ -d | grep -v $movdir)")
 # debug - check if you see all your folders
-#echo "inputdirs:"
-#echo "$inputdirs"
-echo
+# echo "inputdirs:"
+# echo "$inputdirs"
+# echo
 
-inputfile="behind the scene P7254399"
-inputext=".avi"
 
 for inputdir in $inputdirs;do
+	
 	fullinputdir=$rootdir$inputdir
 	cd $fullinputdir
 	#list all AVIs in the folder
 	avis=("$(find -iname "*.AVI" -or -iname "*.avi")")
 	#list all JPGs in the folder
 	jpgs=("$(find -iname "*.JPG" -or -iname "*.jpg" -or -iname "*.jpeg" -or -iname "*.JPEG")")
-	
-	# we skip "mov" folder
-	# if test 
-	
-	# add WAV file
+	# list all WAV files in the folder
+	wavs=("$(find -iname "*.WAV" -or -iname "*.wav")")
 	
 	# we skip all folders that do not have AVI of JPG files
 	if test -z "$avis";then
 		if test -z "$jpgs";then
-			continue
+			if test -z "$wavs";then
+				continue
+			fi
 		fi
 	fi
 	
 	echo "We are in the dir => $inputdir"
 	
-	echo "AVI files:"
-	echo "$avis"
+	# echo "AVI files:"
+	# echo "$avis"
+	# echo 
+	# echo "JPG files:"
+	# echo "$jpgs"
+	# echo 
+	# echo "WAV files:"
+	# echo "$wavs"
+	
+
 
 	# make a new MOV dir
 	outputdir=$rootdir$movdir$inputdir
@@ -77,6 +83,13 @@ for inputdir in $inputdirs;do
 		cp -f "$file" "$outputdir"
 	done
 	
+	# copy WAVs to the new folder
+	for file in $wavs;do
+		# echo "file to copy = $file"
+		cp -f "$file" "$outputdir"
+	done
+	
+	
 	#break
 	
 	echo
@@ -88,5 +101,5 @@ done
 cd $DIR
 
 
-#does not convert 🤷‍
+#does not convert
 #bin/ffmpeg.exe -i "/C/Users/nadez/Dropbox/Online Business/Existing Websites/Unicorn/Images/Air Omni/0 - behind the scene/behind the scene P7254399.avi" -acodec libmp3lame -ab 192 "converted.mov"
